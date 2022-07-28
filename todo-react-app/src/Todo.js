@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   ListItem,
   ListItemText,
@@ -7,45 +7,76 @@ import {
   ListItemSecondaryAction,
   IconButton,
 } from "@material-ui/core";
-import DeleteOutlined from "@material-ui/icons/DeleteOutlined"
+import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
 
 class Todo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { item: props.item, readOnly: true };
+    this.delete = props.delete;
+  }
 
-    constructor(props) {
-        super(props);
-        this.state = { item: props.item };
-        this.delete = props.delete;
-    }
-    deleteEventHandler = () => {
-        this.delete(this.state.item);
-    }
+  deleteEventHandler = () => {
+    this.delete(this.state.item);
+  };
 
-    render() {
-        const item = this.state.item;
-        return (
-            <ListItem>
-                <Checkbox checked={item.done} />
-                <ListItemText>
-                    <InputBase 
-                        inputProps={{"arial-label": "naked"}}
-                        type="text"
-                        id={item.id}
-                        name={item.name}
-                        value={item.title}
-                        multiline={true}
-                        fullWidth={true}
-                    />  
-                </ListItemText>
-                <ListItemSecondaryAction>
-                    <IconButton 
-                    aria-label="Delete Todo"
-                    onClick={this.deleteEventHandler}>
-                        <DeleteOutlined />
-                    </IconButton>
-                </ListItemSecondaryAction>
-            </ListItem>
-        );
+  offReadOnlyMode = () => {
+    this.setState({ readOnly: false }, () => {
+      console.log("ReadOnly? ", this.state.readOnly);
+    });
+  };
+
+  enterKeyEventHandler = (e) => {
+    if (e.key === "Enter") {
+      this.setState({ readOnly: true });
     }
+  };
+
+  editEventHandler = (e) => {
+    const thisItem = this.state.item;
+    thisItem.title = e.target.value;
+    this.setState({item: thisItem});
+  };
+
+  checkboxEventHandler = (e) => {
+    const thisItem = this.state.item;
+    thisItem.done = !thisItem.done;
+    this.setState({ item: thisItem});
+  };
+
+  render() {
+    const item = this.state.item;
+    return (
+      <ListItem>
+        <Checkbox checked={item.done} onChange={this.checkboxEventHandler} />
+        <ListItemText>
+          <InputBase
+            inputProps={{
+              "aria-label": "naked",
+              readOnly: this.state.readOnly,
+            }}
+            onClick={this.offReadOnlyMode}
+            type="text"
+            id={item.id}
+            name={item.id}
+            value={item.title}
+            multiline={true}
+            fullWidth={true}
+            onKeyDown={this.enterKeyEventHandler}
+            onChange={this.editEventHandler}
+          />
+        </ListItemText>
+        <ListItemSecondaryAction>
+          <IconButton
+            aria-label="Delete Todo"
+            onClick={this.deleteEventHandler}
+          >
+            <DeleteOutlined />
+          </IconButton>
+        </ListItemSecondaryAction>
+      </ListItem>
+    );
+  }
 }
 
 export default Todo;
